@@ -4,10 +4,6 @@ import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Formatter;
@@ -18,6 +14,7 @@ public class GuiManager {
     private int rows;
     private String title;
     private Inventory inventory;
+    private String state;
 
     private UltimateStoragePlus ultimateStoragePlus;
 
@@ -36,7 +33,7 @@ public class GuiManager {
     }
 
     private void setup(Inventory inventory, Storage owner) {
-        for (int slot = 27; slot < 26+9; slot++) {
+        for (int slot = 27; slot < 4*9; slot++) {
             inventory.setItem(slot, new ItemBuilder(Material.BARRIER).setDisplayName(ChatColor.BLACK + "").setGlow(true).build());
         }
 
@@ -44,10 +41,19 @@ public class GuiManager {
             Formatter amount = new Formatter();
             amount.format("%,d", owner.getAmount());
             String name = "%sContains %s of %s".formatted(ChatColor.YELLOW, amount, owner.getItemStack().getType());
-            inventory.setItem(27, new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build());
             inventory.setItem(28, new ItemBuilder(Material.MAP).setDisplayName(name).setGlow(true).build());
         }
+        this.state = "pull";
+        inventory.setItem(27, new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build());
 
+    }
+
+    public void updateState(String state) {
+        if (this.state.equalsIgnoreCase("pull")) {
+            this.state = "drop";
+        } else {
+            this.state = "pull";
+        }
     }
 
     public Inventory getInventory() {
@@ -56,5 +62,9 @@ public class GuiManager {
 
     public Storage getStorage(){
         return this.owner;
+    }
+
+    public String getState() {
+        return this.state;
     }
 }

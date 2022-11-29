@@ -2,7 +2,6 @@ package fr.slophil.ultimatestorageplus.events;
 
 import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import fr.slophil.ultimatestorageplus.utils.GuiManager;
-import fr.slophil.ultimatestorageplus.utils.ItemBuilder;
 import fr.slophil.ultimatestorageplus.utils.Storage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,12 +13,10 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class StorageInventoryClickEvent implements Listener {
 

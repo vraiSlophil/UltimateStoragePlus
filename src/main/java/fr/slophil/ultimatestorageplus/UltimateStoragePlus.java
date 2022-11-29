@@ -51,8 +51,9 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
         pluginManager.registerEvents(new BarrelBreakEvent(this), this);
         pluginManager.registerEvents(new BarrelPlaceEvent(this), this);
-        pluginManager.registerEvents(new StorageInventoryOpenEvent(this), this);
+        pluginManager.registerEvents(new StorageClickEvent(this), this);
         pluginManager.registerEvents(new StorageInventoryClickEvent(this), this);
+        pluginManager.registerEvents(new StorageInventoryOpenEvent(this), this);
     }
 
     private void setupCommands() {
