@@ -11,24 +11,19 @@ import java.util.Formatter;
 public class GuiManager {
 
     private Storage owner;
-    private int rows;
-    private String title;
     private Inventory inventory;
     private String state;
 
-    private UltimateStoragePlus ultimateStoragePlus;
-
     public GuiManager(UltimateStoragePlus ultimateStoragePlus) {
-        this.ultimateStoragePlus = ultimateStoragePlus;
     }
     public GuiManager(Storage owner) {
         this.owner = owner;
-        this.rows = 4*9;
+        int rows = 4 * 9;
         Formatter cap = new Formatter();
         cap.format("%,d", owner.getCapacity());
-        this.title = "%sUltimate Storage - %s capacity".formatted(ChatColor.YELLOW, cap);
+        String title = "%sUltimate Storage - %s capacity".formatted(ChatColor.YELLOW, cap);
 
-        this.inventory = Bukkit.createInventory(owner.getInventoryHolder(), this.rows, this.title);
+        this.inventory = Bukkit.createInventory(owner.getInventoryHolder(), rows, title);
         setup(this.inventory, owner);
     }
 
@@ -43,17 +38,17 @@ public class GuiManager {
             String name = "%sContains %s of %s".formatted(ChatColor.YELLOW, amount, owner.getItemStack().getType());
             inventory.setItem(28, new ItemBuilder(Material.MAP).setDisplayName(name).setGlow(true).build());
         }
-        this.state = "pull";
-        inventory.setItem(27, new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build());
+        this.setState("pull");
 
     }
 
-    public void updateState(String state) {
-        if (this.state.equalsIgnoreCase("pull")) {
-            this.state = "drop";
-        } else {
-            this.state = "pull";
+    public void setState(String state) {
+        this.state = state;
+        if (state.equals("drop")) {
+            this.inventory.setItem(27, new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build());
+            return;
         }
+        this.inventory.setItem(27, new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build());
     }
 
     public Inventory getInventory() {

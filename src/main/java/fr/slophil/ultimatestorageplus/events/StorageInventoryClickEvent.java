@@ -2,8 +2,11 @@ package fr.slophil.ultimatestorageplus.events;
 
 import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import fr.slophil.ultimatestorageplus.utils.GuiManager;
+import fr.slophil.ultimatestorageplus.utils.ItemBuilder;
 import fr.slophil.ultimatestorageplus.utils.Storage;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -64,6 +67,22 @@ public class StorageInventoryClickEvent implements Listener {
 
         List<Integer> menuSlots = new ArrayList<>(Arrays.asList(27, 28, 29, 30, 31, 32, 33, 34, 35, 36));
 
+
+        int slot = event.getSlot();
+        InventoryAction inventoryAction = event.getAction();
+        Player player = (Player) event.getWhoClicked();
+        ItemStack cursor = event.getCursor();
+
+        if (menuSlots.contains(slot)) {
+            if (slot == 27 && customInventory.getState().equals("pull")){
+                customInventory.setState("drop");
+            }
+            if (slot == 27 && customInventory.getState().equals("drop")){
+                customInventory.setState("pull");
+            }
+            event.setCancelled(true);
+        }
+
 //        List<Integer> getSlots = new ArrayList<>(Arrays.asList(
 //                0, 1, 2, 3,
 //                9, 10, 11, 12,
@@ -81,15 +100,6 @@ public class StorageInventoryClickEvent implements Listener {
 //                41, 42, 43, 44,
 //                50, 51, 52, 53
 //        ));
-
-        int slot = event.getSlot();
-        InventoryAction inventoryAction = event.getAction();
-        Player player = (Player) event.getWhoClicked();
-        ItemStack cursor = event.getCursor();
-
-        if (menuSlots.contains(slot)) {
-            event.setCancelled(true);
-        }
 
         // First step
 

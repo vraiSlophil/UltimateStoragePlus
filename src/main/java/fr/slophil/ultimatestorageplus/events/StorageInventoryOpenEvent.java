@@ -53,7 +53,13 @@ public class StorageInventoryOpenEvent implements Listener {
         int stack = 64;
 
         if (storage.getItemStack() != null && customInventory.getState().equals("pull")) {
-            int slot = (int) amount / stack;
+            if (amount >= 3*9*stack) {
+                for (int i = 0; i < 3*9; i++) {
+                    addItem(stack, storage, inventory);
+                }
+                return;
+            }
+            int slot = amount / stack;
             int block = amount % stack;
 
             for (int i = 0; i < slot; i++) {
