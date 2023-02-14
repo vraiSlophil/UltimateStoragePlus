@@ -12,10 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.BlockInventoryHolder;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +35,7 @@ public class StorageInventoryClickEvent implements Listener {
         }
 
         InventoryHolder inventoryHolder = inventory.getHolder();
-        ItemStack itemStack = event.getCurrentItem();
+        ItemStack currentItem = event.getCurrentItem();
 
         if (inventoryHolder == null) {
             return;
@@ -61,27 +58,52 @@ public class StorageInventoryClickEvent implements Listener {
             return;
         }
 
-        if (itemStack == null) {
+        if (currentItem == null) {
+            System.out.println("cursorItem null");
             return;
         }
 
         List<Integer> menuSlots = new ArrayList<>(Arrays.asList(27, 28, 29, 30, 31, 32, 33, 34, 35, 36));
 
-
         int slot = event.getSlot();
-        InventoryAction inventoryAction = event.getAction();
         Player player = (Player) event.getWhoClicked();
-        ItemStack cursor = event.getCursor();
 
         if (menuSlots.contains(slot)) {
             if (slot == 27 && customInventory.getState().equals("pull")){
                 customInventory.setState("drop");
-            }
-            if (slot == 27 && customInventory.getState().equals("drop")){
+            } else if (slot == 27 && customInventory.getState().equals("drop")){
                 customInventory.setState("pull");
             }
             event.setCancelled(true);
         }
+
+        if (customInventory.getState().equals("pull") && player.getInventory().firstEmpty() >= 0) {
+            customInventory.getInventory().removeItem(currentItem);
+            player.getInventory().addItem(currentItem);
+            event.setCancelled(true);
+
+        }
+
+        if (currentItem.isSimilar(customInventory.getStorage().getItemStack())
+                && inventory.getHolder() instanceof PlayerInventory
+                && inventoryHolder instanceof Player) {
+            event.setCancelled(true);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //        List<Integer> getSlots = new ArrayList<>(Arrays.asList(
 //                0, 1, 2, 3,

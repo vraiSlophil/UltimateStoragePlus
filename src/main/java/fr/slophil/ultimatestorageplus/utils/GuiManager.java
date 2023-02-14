@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Formatter;
 
@@ -13,6 +14,9 @@ public class GuiManager {
     private Storage owner;
     private Inventory inventory;
     private String state;
+
+    private final ItemStack pullItemStack = new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build();
+    private final ItemStack dropItemStack = new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build();
 
     public GuiManager(UltimateStoragePlus ultimateStoragePlus) {
     }
@@ -45,10 +49,10 @@ public class GuiManager {
     public void setState(String state) {
         this.state = state;
         if (state.equals("drop")) {
-            this.inventory.setItem(27, new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build());
+            this.inventory.setItem(27, dropItemStack);
             return;
         }
-        this.inventory.setItem(27, new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build());
+        this.inventory.setItem(27, pullItemStack);
     }
 
     public Inventory getInventory() {
