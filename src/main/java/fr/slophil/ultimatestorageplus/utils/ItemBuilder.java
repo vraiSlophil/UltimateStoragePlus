@@ -47,7 +47,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setUnbreakable (boolean unbreakable) {
+    public ItemBuilder setUnbreakable(boolean unbreakable) {
         ItemMeta meta = stack.getItemMeta();
         meta.setUnbreakable(unbreakable);
         stack.setItemMeta(meta);
@@ -78,7 +78,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setItemStack (ItemStack stack) {
+    public ItemBuilder setItemStack(ItemStack stack) {
         this.stack = stack;
         return this;
     }
@@ -90,7 +90,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setLore (String lore) {
+    public ItemBuilder setLore(String lore) {
         ArrayList<String> loreList = new ArrayList<>();
         loreList.add(lore);
         ItemMeta meta = getItemMeta();
@@ -113,11 +113,11 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setPersistentDataContainer(NamespacedKey namespacedKey, PersistentDataType persistentDataType, Integer value){
+    public ItemBuilder setPersistentDataContainer(NamespacedKey namespacedKey, PersistentDataType persistentDataType, Integer value) {
 
         ItemMeta meta = getItemMeta();
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        if (!data.has(namespacedKey, PersistentDataType.INTEGER)){
+        if (!data.has(namespacedKey, PersistentDataType.INTEGER)) {
             data.set(namespacedKey, persistentDataType, value);
         } else {
             return null;

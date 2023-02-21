@@ -20,8 +20,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
 //    private GuiManager guiManager;
 
-    private final HashMap<Location, Storage> storageList = new HashMap<Location, Storage>();
-    private final HashMap<Storage, GuiManager> storageInventoryList = new HashMap<Storage, GuiManager>();
+    private static UltimateStoragePlus instance;
 
     private final String pluginPrefix = ChatColor.GOLD.toString() + ChatColor.BOLD.toString() +
             getDescription().getName() + ChatColor.DARK_RED.toString() + " : ";
@@ -45,8 +44,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
     }
 
     private void setup() {
-        this.recipeManager = new RecipeManager(this);
-//        this.guiManager = new GuiManager(this);
+        BlockType.registerRecipes();
     }
 
     private void registerEvents() {
@@ -63,23 +61,17 @@ public final class UltimateStoragePlus extends JavaPlugin {
         this.getCommand("UltimateStoragePlus").setExecutor(new UltimateStoragePlusCommand(this));
     }
 
-    public String getPluginPrefix() {
-        return this.pluginPrefix;
+    public SQLiteConnector getConnector() {
+        return connector;
+    }
+
+    public static UltimateStoragePlus getInstance() {
+        return instance;
     }
 
     public RecipeManager getRecipeManager() {
         return this.recipeManager;
     }
-
-    public HashMap<Location, Storage> getStorageList() {
-        return this.storageList;
-    }
-
-    public HashMap<Storage, GuiManager> getStorageInventoryList() {
-        return this.storageInventoryList;
-    }
-
-    //config messages
 
     public String getPlayerNoPermission() {
         return ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("PlayerNoPermission"));

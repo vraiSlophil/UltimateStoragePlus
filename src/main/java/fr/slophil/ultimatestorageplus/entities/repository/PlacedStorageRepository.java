@@ -27,9 +27,9 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
                     blockX INT(255) NOT NULL,
                     blockY INT(255) NOT NULL,
                     blockZ INT(255) NOT NULL,
-                    world TEXT NOT NULL,
+                    blockWorld TEXT NOT NULL,
                     blockType TEXT NOT NULL,
-                    PRIMARY KEY (blockX, blockY, blockZ, world)
+                    PRIMARY KEY (blockX, blockY, blockZ, blockWorld)
                     
                 );
                 """);
