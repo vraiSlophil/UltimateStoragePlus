@@ -55,9 +55,18 @@ public class BarrelPlaceEvent  implements Listener {
         if (itemContainer.has(key, PersistentDataType.INTEGER)){
             InventoryHolder holder = (Barrel) block.getState();
 
-            new Storage(ultimateStoragePlus, blockLocation, itemContainer.get(key, PersistentDataType.INTEGER), holder);
-            blockContainer.set(key, PersistentDataType.INTEGER, itemContainer.get(key, PersistentDataType.INTEGER));
-            blockState.update();
+            PlacedStorageRepository repository = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
+
+            PlacedStorage coords = new PlacedStorage(blockLocation, BlockType.STORAGE_1K);
+            try {
+                repository.save(coords);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+//            new Storage(ultimateStoragePlus, blockLocation, itemContainer.get(key, PersistentDataType.INTEGER), holder);
+//            blockContainer.set(key, PersistentDataType.INTEGER, itemContainer.get(key, PersistentDataType.INTEGER));
+//            blockState.update();
         }
     }
 }

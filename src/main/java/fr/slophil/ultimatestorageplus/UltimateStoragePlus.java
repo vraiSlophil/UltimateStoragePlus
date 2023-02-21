@@ -2,13 +2,13 @@ package fr.slophil.ultimatestorageplus;
 
 import fr.slophil.ultimatestorageplus.commands.UltimateStoragePlusCommand;
 import fr.slophil.ultimatestorageplus.events.*;
-
+import fr.slophil.ultimatestorageplus.utils.BlockType;
 import fr.slophil.ultimatestorageplus.utils.GuiManager;
-
-import fr.slophil.ultimatestorageplus.utils.RecipeManager;
+import fr.slophil.ultimatestorageplus.utils.SQLiteConnector;
 import fr.slophil.ultimatestorageplus.utils.Storage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,6 +32,9 @@ public final class UltimateStoragePlus extends JavaPlugin {
         this.setup();
         this.registerEvents();
         this.setupCommands();
+
+        this.connector = new SQLiteConnector(this);
+        connector.connect();
 
         getLogger().log(Level.INFO, "Plugin enabled !");
     }

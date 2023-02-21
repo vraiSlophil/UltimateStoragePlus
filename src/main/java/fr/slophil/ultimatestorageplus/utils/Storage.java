@@ -2,8 +2,6 @@ package fr.slophil.ultimatestorageplus.utils;
 
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
-
 public class Storage {
     private int maxQuantity;
     private int storedQuantity;

@@ -1,6 +1,5 @@
 package fr.slophil.ultimatestorageplus.utils;
 
-import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,52 +9,71 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.persistence.PersistentDataType;
 
-public class RecipeManager {
+import java.util.function.UnaryOperator;
 
-    private final ItemStack storage1k;
-    private final ItemStack storage2k;
-    private final ItemStack storage4k;
-    private final ItemStack storage8k;
-    private final ItemStack storage16k;
-    private final ItemStack storage32k;
-    private final ItemStack storage64k;
-    private final ItemStack storage128k;
-    private final ItemStack storage256k;
-    private final ItemStack storage512k;
-    private final ItemStack storage1M;
-    private final ItemStack storage2M;
-    private final ItemStack storage4M;
-    private final ItemStack storage8M;
-    private final ItemStack storage16M;
+import static fr.slophil.ultimatestorageplus.UltimateStoragePlus.STORAGE_KEY;
 
-    private final ShapedRecipe storage1kRecipe;
-    private final ShapedRecipe storage2kRecipe;
-    private final ShapedRecipe storage4kRecipe;
-    private final ShapedRecipe storage8kRecipe;
-    private final ShapedRecipe storage16kRecipe;
-    private final ShapedRecipe storage32kRecipe;
-    private final ShapedRecipe storage64kRecipe;
-    private final ShapedRecipe storage128kRecipe;
-    private final ShapedRecipe storage256kRecipe;
-    private final ShapedRecipe storage512kRecipe;
-    private final ShapedRecipe storage1MRecipe;
-    private final ShapedRecipe storage2MRecipe;
-    private final ShapedRecipe storage4MRecipe;
-    private final ShapedRecipe storage8MRecipe;
-    private final ShapedRecipe storage16MRecipe;
+public enum BlockType {
 
+    STORAGE_1K(
+            new ItemBuilder(Material.BARREL)
+                    .setPersistentDataContainer(STORAGE_KEY, PersistentDataType.INTEGER, 1024)
+                    .setDisplayName(ChatColor.YELLOW + "Ultimate Storage - 1,024 capacity")
+                    .setGlow(true).build(),
+            (recipe) -> recipe
+                    .shape("BEB", "IRI", "BEB")
+                    .setIngredient('B', Material.BARREL)
+                    .setIngredient('E', Material.EMERALD_BLOCK)
+                    .setIngredient('I', Material.IRON_BLOCK)
+                    .setIngredient('R', Material.REDSTONE_BLOCK)
+    ),
+    STORAGE_2K(
+            new ItemBuilder(Material.BARREL)
+                    .setPersistentDataContainer(STORAGE_KEY, PersistentDataType.INTEGER, 2048)
+                    .setDisplayName(ChatColor.YELLOW + "Ultimate Storage - 2,048 capacity")
+                    .setGlow(true).build(),
+            (recipe) -> recipe
+                    .shape("BEB", "IRI", "BEB")
+                    .setIngredient('B', new RecipeChoice.MaterialChoice.ExactChoice(STORAGE_1K.item))
+                    .setIngredient('E', Material.EMERALD_BLOCK)
+                    .setIngredient('I', Material.IRON_BLOCK)
+                    .setIngredient('R', Material.REDSTONE_BLOCK)
+    );
+
+    private final ItemStack item;
+    private final ShapedRecipe recipe;
     private final NamespacedKey key;
 
-    public RecipeManager(UltimateStoragePlus ultimateStoragePlus) {
+    BlockType(ItemStack item, UnaryOperator<ShapedRecipe> recipeProvider) {
+        this.item = item;
+        this.key = new NamespacedKey("ultimatestorageplus", name().toLowerCase());
+        this.recipe = recipeProvider.apply(new ShapedRecipe(key, item));
+    }
+
+    public static void registerRecipes() {
+        for (BlockType recipe : values()) {
+            Bukkit.addRecipe(recipe.recipe);
+        }
+    }
+
+    public ItemStack getItem() {
+        return item;
+    }
+
+    public NamespacedKey getKey() {
+        return key;
+    }
+
+    public ShapedRecipe getRecipe() {
+        return recipe;
+    }
+
+    /*public RecipeManager(UltimateStoragePlus ultimateStoragePlus) {
 
         //setup PersistentDataContainer key
         key = new NamespacedKey(ultimateStoragePlus, "BARRELSTORAGEPLUS");
 
         //setup Itemstacks for Big storage Barrel
-        this.storage1k = new ItemBuilder(Material.BARREL)
-                .setPersistentDataContainer(key, PersistentDataType.INTEGER, 1024)
-                .setDisplayName(ChatColor.YELLOW + "Ultimate Storage - 1,024 capacity")
-                .setGlow(true).build();
         this.storage2k = new ItemBuilder(Material.BARREL)
                 .setPersistentDataContainer(key, PersistentDataType.INTEGER, 2048)
                 .setDisplayName(ChatColor.YELLOW + "Ultimate Storage - 2,048 capacity")
@@ -220,101 +238,5 @@ public class RecipeManager {
         Bukkit.addRecipe(getStorage4MRecipe());
         Bukkit.addRecipe(getStorage8MRecipe());
         Bukkit.addRecipe(getStorage16MRecipe());
-    }
-
-    public ItemStack getStorage1k() {
-        return storage1k;
-    }
-    public ItemStack getStorage2k() {
-        return storage2k;
-    }
-    public ItemStack getStorage4k() {
-        return storage4k;
-    }
-    public ItemStack getStorage8k() {
-        return storage8k;
-    }
-    public ItemStack getStorage16k() {
-        return storage16k;
-    }
-    public ItemStack getStorage32k() {
-        return storage32k;
-    }
-    public ItemStack getStorage64k() {
-        return storage64k;
-    }
-    public ItemStack getStorage128k() {
-        return storage128k;
-    }
-    public ItemStack getStorage256k() {
-        return storage256k;
-    }
-    public ItemStack getStorage512k() {
-        return storage512k;
-    }
-    public ItemStack getStorage1M() {
-        return storage1M;
-    }
-    public ItemStack getStorage2M() {
-        return storage2M;
-    }
-    public ItemStack getStorage4M() {
-        return storage4M;
-    }
-    public ItemStack getStorage8M() {
-        return storage8M;
-    }
-    public ItemStack getStorage16M() {
-        return storage16M;
-    }
-
-    public ShapedRecipe getStorage1kRecipe() {
-        return storage1kRecipe;
-    }
-    public ShapedRecipe getStorage2kRecipe() {
-        return storage2kRecipe;
-    }
-    public ShapedRecipe getStorage4kRecipe() {
-        return storage4kRecipe;
-    }
-    public ShapedRecipe getStorage8kRecipe() {
-        return storage8kRecipe;
-    }
-    public ShapedRecipe getStorage16kRecipe() {
-        return storage16kRecipe;
-    }
-    public ShapedRecipe getStorage32kRecipe() {
-        return storage32kRecipe;
-    }
-    public ShapedRecipe getStorage64kRecipe() {
-        return storage64kRecipe;
-    }
-    public ShapedRecipe getStorage128kRecipe() {
-        return storage128kRecipe;
-    }
-    public ShapedRecipe getStorage256kRecipe() {
-        return storage256kRecipe;
-    }
-    public ShapedRecipe getStorage512kRecipe() {
-        return storage512kRecipe;
-    }
-    public ShapedRecipe getStorage1MRecipe() {
-        return storage1MRecipe;
-    }
-    public ShapedRecipe getStorage2MRecipe() {
-        return storage2MRecipe;
-    }
-    public ShapedRecipe getStorage4MRecipe() {
-        return storage4MRecipe;
-    }
-    public ShapedRecipe getStorage8MRecipe() {
-        return storage8MRecipe;
-    }
-    public ShapedRecipe getStorage16MRecipe() {
-        return storage16MRecipe;
-    }
-
-    public NamespacedKey getKey() {
-        return key;
-    }
+    }*/
 }

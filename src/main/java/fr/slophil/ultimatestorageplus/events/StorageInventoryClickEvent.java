@@ -68,27 +68,27 @@ public class StorageInventoryClickEvent implements Listener {
         int slot = event.getSlot();
         Player player = (Player) event.getWhoClicked();
 
-        if (menuSlots.contains(slot)) {
-            if (slot == 27 && customInventory.getState().equals("pull")){
-                customInventory.setState("drop");
-            } else if (slot == 27 && customInventory.getState().equals("drop")){
-                customInventory.setState("pull");
-            }
-            event.setCancelled(true);
-        }
-
-        if (customInventory.getState().equals("pull") && player.getInventory().firstEmpty() >= 0) {
-            customInventory.getInventory().removeItem(currentItem);
-            player.getInventory().addItem(currentItem);
-            event.setCancelled(true);
-
-        }
-
-        if (currentItem.isSimilar(customInventory.getStorage().getItemStack())
-                && inventory.getHolder() instanceof PlayerInventory
-                && inventoryHolder instanceof Player) {
-            event.setCancelled(true);
-        }
+//        if (menuSlots.contains(slot)) {
+//            if (slot == 27 && customInventory.getState().equals("pull")){
+//                customInventory.setState("drop");
+//            } else if (slot == 27 && customInventory.getState().equals("drop")){
+//                customInventory.setState("pull");
+//            }
+//            event.setCancelled(true);
+//        }
+//
+//        if (customInventory.getState().equals("pull") && player.getInventory().firstEmpty() >= 0) {
+//            customInventory.getInventory().removeItem(currentItem);
+//            player.getInventory().addItem(currentItem);
+//            event.setCancelled(true);
+//
+//        }
+//
+//        if (currentItem.isSimilar(customInventory.getStorage().getItemStack())
+//                && inventory.getHolder() instanceof PlayerInventory
+//                && inventoryHolder instanceof Player) {
+//            event.setCancelled(true);
+//        }
 
 
 

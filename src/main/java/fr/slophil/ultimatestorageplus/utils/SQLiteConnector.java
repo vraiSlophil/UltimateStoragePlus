@@ -1,9 +1,12 @@
 package fr.slophil.ultimatestorageplus.utils;
 
 import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
+import fr.slophil.ultimatestorageplus.entities.repository.Repositories;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,18 +39,30 @@ public class SQLiteConnector {
     public boolean connect() {
         try {
             // Vérification de l'existence du dossier du plugin
-            File dataFolder = new File(plugin.getDataFolder(), "UltimateStoragePlusDatabase.db");
-            if (!dataFolder.exists()) {
-                dataFolder.getParentFile().mkdirs();
-                plugin.saveResource("UltimateStoragePlusDatabase.db", false);
+            Path dbFile = Path.of(plugin.getDataFolder().getAbsolutePath(), "UltimateStoragePlusDatabase.db");
+            if (!Files.exists(dbFile.getParent())) {
+                Files.createDirectories(dbFile.getParent());
+            }
+            if (!Files.exists(dbFile)) {
+                Files.createFile(dbFile);
             }
 
             // Connexion à la base de données
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder.getAbsolutePath());
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.toAbsolutePath());
+
+            for (Repositories repository : Repositories.values()) {
+                repository.getRepository().hydrate(connection);
+                repository.getRepository().create();
+            }
+
+
+
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

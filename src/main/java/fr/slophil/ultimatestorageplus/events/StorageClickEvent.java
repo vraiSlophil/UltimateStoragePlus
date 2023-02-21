@@ -59,9 +59,10 @@ public class StorageClickEvent implements Listener {
             return;
         }
 
-        Player player = (Player) event.getPlayer();
-        Storage storage = ultimateStoragePlus.getStorageList().get(location);
-        GuiManager guiManager = ultimateStoragePlus.getStorageInventoryList().get(storage);
+        event.setCancelled(true);
+        Player player = event.getPlayer();
+//        Storage storage = ultimateStoragePlus.getStorageList().get(location);
+//        GuiManager guiManager = ultimateStoragePlus.getStorageInventoryList().get(storage);
 
         event.setCancelled(true);
         player.openInventory(guiManager.getInventory());

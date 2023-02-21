@@ -49,37 +49,37 @@ public class StorageInventoryOpenEvent implements Listener {
         Storage storage = ultimateStoragePlus.getStorageList().get(location);
         GuiManager customInventory = ultimateStoragePlus.getStorageInventoryList().get(storage);
 
-        int amount = storage.getAmount();
-        int stack = 64;
-
-        if (storage.getItemStack() != null && customInventory.getState().equals("pull")) {
-            if (amount >= 3*9*stack) {
-                for (int i = 0; i < 3*9; i++) {
-                    addItem(stack, storage, inventory);
-                }
-                return;
-            }
-            int slot = amount / stack;
-            int block = amount % stack;
-
-            for (int i = 0; i < slot; i++) {
-                addItem(stack, storage, inventory);
-            }
-            if (block >= 0) {
-                addItem(block, storage, inventory);
-            }
-        }
-    }
-
-    public void addItem(int i, Storage storage, Inventory inventory) {
-        ItemMeta itemMeta = storage.getItemStack().getItemMeta();
-        ItemStack item = new ItemBuilder(storage.getItemStack().getType()).setItemMeta(itemMeta).setAmount(i).build();
-        try {
-            storage.removeItem(i);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-        inventory.addItem(item);
+//        int amount = storage.getAmount();
+//        int stack = 64;
+//
+//        if (storage.getItemStack() != null && customInventory.getState().equals("pull")) {
+//            if (amount >= 3*9*stack) {
+//                for (int i = 0; i < 3*9; i++) {
+//                    addItem(stack, storage, inventory);
+//                }
+//                return;
+//            }
+//            int slot = amount / stack;
+//            int block = amount % stack;
+//
+//            for (int i = 0; i < slot; i++) {
+//                addItem(stack, storage, inventory);
+//            }
+//            if (block >= 0) {
+//                addItem(block, storage, inventory);
+//            }
+//        }
+//    }
+//
+//    public void addItem(int i, Storage storage, Inventory inventory) {
+//        ItemMeta itemMeta = storage.getItemStack().getItemMeta();
+//        ItemStack item = new ItemBuilder(storage.getItemStack().getType()).setItemMeta(itemMeta).setAmount(i).build();
+//        try {
+//            storage.removeItem(i);
+//        } catch (Throwable e) {
+//            throw new RuntimeException(e);
+//        }
+//        inventory.addItem(item);
     }
 }
 
