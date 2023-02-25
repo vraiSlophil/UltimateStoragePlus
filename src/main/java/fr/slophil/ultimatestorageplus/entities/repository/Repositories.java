@@ -2,7 +2,7 @@ package fr.slophil.ultimatestorageplus.entities.repository;
 
 public enum Repositories {
 
-    PLACED_STORAGE(new PlacedStorageRepository())
+    PLACED_STORAGE(new PlacedStorageRepository()),
 
     ;
 

@@ -1,8 +1,10 @@
 package fr.slophil.ultimatestorageplus.utils;
 
+import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,46 +13,68 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-public class GuiManager implements Listener, InventoryHolder {
+public class StorageInventory implements Listener, InventoryHolder {
+
+    private final static NamespacedKey INVENTORY_KEY = new NamespacedKey(UltimateStoragePlus.getInstance(), "storage_inventory");
     private final InventoryHolder inventoryHolder;
     private final Inventory inventory;
-    private final Storage storage;
     private boolean dropMode;
     private boolean pullMode;
     private final int inventorySize = 4 * 9;
 
-    public GuiManager(InventoryHolder inventoryHolder, Storage storage) {
+    private ItemStack storedItem;
+
+    private int storedQuantity;
+
+    private int maxQuantity;
+
+    /**
+     * Constructor of the custom inventory
+     *
+     * @param inventoryHolder the inventory holder
+     */
+    public StorageInventory(InventoryHolder inventoryHolder, BlockType blockType) {
         this.inventoryHolder = inventoryHolder;
-        this.storage = storage;
         this.dropMode = true;
         this.pullMode = false;
-        this.inventory = Bukkit.createInventory(this, this.inventorySize, ChatColor.YELLOW + "Ultimate Storage - " + storage.getMaxQuantity() + "capacity");
-        // On crée un nouvel inventaire custom avec 4 lignes de 9 cases chacune
+
+        this.storedItem = inventoryHolder.getInventory().getItem(0);
+        this.storedQuantity = inventoryHolder.getInventory().getItem(0).getItemMeta().getPersistentDataContainer()
+                .get(this.INVENTORY_KEY, PersistentDataType.INTEGER);
+        this.maxQuantity = blockType.getItem().getItemMeta().getPersistentDataContainer()
+                .get(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER);
+
+        this.inventory = Bukkit.createInventory(null, this.inventorySize,
+                ChatColor.YELLOW + "Ultimate Storage - " + this.maxQuantity + "capacity");
     }
 
+    /**
+     * This function is used to open the inventory to the player
+     *
+     * @param player the player who will open the inventory
+     * @return nothing
+     */
     public void openInventory(Player player) {
-        updateInventory(); // On met à jour l'inventaire custom avant de l'afficher
+        updateInventory();
         player.openInventory(this.inventory);
     }
 
     public void updateInventory() {
-        ItemStack storedItem = storage.getStoredItem();
-        int storedQuantity = storage.getStoredQuantity();
-        int maxQuantity = storage.getMaxQuantity();
 
         // On ajoute les items stockés dans l'inventaire custom en mode "drop"
         if (this.dropMode) {
             int slot = 0; // On commence à la première case de la première ligne
-            while (storedQuantity > 0 && slot < 27) { // Tant qu'on a des items à ajouter et qu'on est dans l'inventaire custom
-                ItemStack itemStack = new ItemStack(storedItem);
-                int quantityToAdd = Math.min(storedQuantity, storedItem.getMaxStackSize()); // On ajoute un stack complet si possible, sinon on ajoute ce qu'il reste
+            while (this.storedQuantity > 0 && slot < 27) { // Tant qu'on a des items à ajouter et qu'on est dans l'inventaire custom
+                ItemStack itemStack = new ItemStack(this.storedItem);
+                int quantityToAdd = Math.min(this.storedQuantity, this.storedItem.getMaxStackSize()); // On ajoute un stack complet si possible, sinon on ajoute ce qu'il reste
                 itemStack.setAmount(quantityToAdd);
                 this.inventory.setItem(slot, itemStack);
-                storedQuantity -= quantityToAdd;
+                this.storedQuantity -= quantityToAdd;
                 slot++;
             }
         }
@@ -60,9 +84,9 @@ public class GuiManager implements Listener, InventoryHolder {
             this.inventory.setItem(i, new ItemBuilder(Material.BARRIER).setDisplayName(ChatColor.BLACK + "").setGlow(true).build());
         }
         ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Stocked item : " + (storedItem == null ? "anything" : storedItem.getType().toString()));
-        lore.add(ChatColor.GRAY + "Quantity : " + storedQuantity + " / " + maxQuantity);
-        ItemStack barrel = new ItemBuilder(Material.BARREL).setDisplayName(ChatColor.YELLOW + "Ultimate Storage - " + maxQuantity + "capacity").setLore(lore).build();
+        lore.add(ChatColor.GRAY + "Stocked item : " + (this.storedItem == null ? "anything" : this.storedItem.getType().toString()));
+        lore.add(ChatColor.GRAY + "Quantity : " + this.storedQuantity + " / " + this.maxQuantity);
+        ItemStack barrel = new ItemBuilder(Material.BARREL).setDisplayName(ChatColor.YELLOW + "Ultimate Storage - " + this.maxQuantity + "capacity").setLore(lore).build();
         this.inventory.setItem(30, barrel); // On affiche le tonneau de stockage
         if (this.pullMode) { // Si on est en mode "pull"
             ItemStack pullItem = new ItemBuilder(Material.CHEST).setDisplayName(ChatColor.YELLOW + "Mode pull").build();
@@ -89,8 +113,8 @@ public class GuiManager implements Listener, InventoryHolder {
         }
         if (event.getRawSlot() >= 27) { // Si l'item cliqué est dans la dernière ligne
             if (event.getRawSlot() == 32) { // Si on a cliqué sur le bouton pour changer de mode
-                dropMode = !dropMode;
-                pullMode = !pullMode;
+                this.dropMode = !this.dropMode;
+                this.pullMode = !this.pullMode;
                 updateInventory(); // On met à jour l'inventaire custom pour afficher le nouveau mode
             }
             return; // On ne fait rien d'autre si on a cliqué sur un bouton de la dernière ligne
@@ -100,7 +124,7 @@ public class GuiManager implements Listener, InventoryHolder {
             int quantityToAdd = currentItem.getAmount();
             int quantityAdded = storage.addItems(quantityToAdd, currentItem);
             currentItem.setAmount(quantityToAdd - quantityAdded);
-        } else if (pullMode) {
+        } else if (this.pullMode) {
             int quantityToRemove = currentItem.getAmount();
             int quantityRemoved = storage.removeItems(quantityToRemove);
             if (quantityRemoved > 0) {
@@ -129,12 +153,12 @@ public class GuiManager implements Listener, InventoryHolder {
                 quantityMoved += item.getAmount();
             }
         }
-        if (dropMode) {
+        if (this.dropMode) {
             int quantityAdded = storage.addItems(quantityMoved, draggedItems.get(0));
             if (quantityAdded < quantityMoved) {
                 quantityMoved = quantityAdded;
             }
-        } else if (pullMode) {
+        } else if (this.pullMode) {
             int quantityRemoved = storage.removeItems(quantityMoved);
             if (quantityRemoved < quantityMoved) {
                 quantityMoved = quantityRemoved;
@@ -150,16 +174,7 @@ public class GuiManager implements Listener, InventoryHolder {
 }
 
 
-
-
-
-
-
-
-
-
-
-//public class GuiManager {
+//public class StorageInventory {
 //
 //    private Storage owner;
 //    private Inventory inventory;
@@ -168,9 +183,9 @@ public class GuiManager implements Listener, InventoryHolder {
 //    private final ItemStack pullItemStack = new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build();
 //    private final ItemStack dropItemStack = new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build();
 //
-//    public GuiManager(UltimateStoragePlus ultimateStoragePlus) {
+//    public StorageInventory(UltimateStoragePlus ultimateStoragePlus) {
 //    }
-//    public GuiManager(Storage owner) {
+//    public StorageInventory(Storage owner) {
 //        this.owner = owner;
 //        int rows = 4 * 9;
 //        Formatter cap = new Formatter();

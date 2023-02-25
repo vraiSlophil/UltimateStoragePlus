@@ -74,7 +74,7 @@ public class Storage {
 //    private final int capacity;
 //    private final UUID storageUniqueId = UUID.randomUUID();
 //    private ItemStack itemStack = new ItemBuilder(Material.BEDROCK).setDisplayName(ChatColor.RED + "snickers").setGlow(true).build();
-//    private final GuiManager inventory;
+//    private final StorageInventory inventory;
 //    private final InventoryHolder holder;
 ////
 ////    public Storage(UltimateStoragePlus ultimateStoragePlus, Location location, int capacity, int amount,  ItemStack itemStack){
@@ -83,7 +83,7 @@ public class Storage {
 ////        this.amount = amount;
 ////        this.capacity = capacity;
 ////        this.itemStack = itemStack;
-////        this.inventory = new GuiManager(this);
+////        this.inventory = new StorageInventory(this);
 ////        this.ultimateStoragePlus.getStorageList().putIfAbsent(location, this);
 ////        this.ultimateStoragePlus.getStorageInventoryList().putIfAbsent(this, getInventory());
 ////    }
@@ -93,7 +93,7 @@ public class Storage {
 ////        this.location = location;
 ////        this.capacity = capacity;
 ////        this.itemStack = itemStack;
-////        this.inventory = new GuiManager(this);
+////        this.inventory = new StorageInventory(this);
 ////        this.ultimateStoragePlus.getStorageList().putIfAbsent(location, this);
 ////        this.ultimateStoragePlus.getStorageInventoryList().putIfAbsent(this, getInventory());
 ////    }
@@ -102,7 +102,7 @@ public class Storage {
 //        this.location = location;
 //        this.capacity = capacity;
 //        this.holder = holder;
-//        this.inventory = new GuiManager(this);
+//        this.inventory = new StorageInventory(this);
 //        ultimateStoragePlus.getStorageList().putIfAbsent(location, this);
 //        ultimateStoragePlus.getStorageInventoryList().putIfAbsent(this, getInventory());
 //    }
@@ -147,7 +147,7 @@ public class Storage {
 //        return this.storageUniqueId;
 //    }
 //
-//    public GuiManager getInventory(){
+//    public StorageInventory getInventory(){
 //        return this.inventory;
 //    }
 //

@@ -9,11 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class BarrelBreakEvent  implements Listener {
+public class BarrelBreakEvent implements Listener {
 
     private final UltimateStoragePlus ultimateStoragePlus;
 
@@ -27,7 +26,6 @@ public class BarrelBreakEvent  implements Listener {
 
         PlacedStorageRepository storageRepository = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
 
-        Connection connection = ultimateStoragePlus.getConnector().getConnection();
         Optional<PlacedStorage> storage = storageRepository.getByLocation(event.getBlock().getLocation());
         if (storage.isPresent()) {
             storageRepository.remove(storage.get());

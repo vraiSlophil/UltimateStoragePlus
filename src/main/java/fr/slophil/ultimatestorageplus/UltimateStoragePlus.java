@@ -1,7 +1,9 @@
 package fr.slophil.ultimatestorageplus;
 
 import fr.slophil.ultimatestorageplus.commands.UltimateStoragePlusCommand;
-import fr.slophil.ultimatestorageplus.events.*;
+import fr.slophil.ultimatestorageplus.events.BarrelBreakEvent;
+import fr.slophil.ultimatestorageplus.events.BarrelPlaceEvent;
+import fr.slophil.ultimatestorageplus.events.StorageClickEvent;
 import fr.slophil.ultimatestorageplus.utils.BlockType;
 import fr.slophil.ultimatestorageplus.utils.SQLiteConnector;
 import org.bukkit.ChatColor;
@@ -16,7 +18,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
     public static final NamespacedKey STORAGE_KEY = new NamespacedKey("ULTIMATESTORAGEPLUS", "persistent_storage");
 
-//    private GuiManager guiManager;
+//    private StorageInventory guiManager;
     private SQLiteConnector connector;
 
     private static UltimateStoragePlus instance;
@@ -52,8 +54,6 @@ public final class UltimateStoragePlus extends JavaPlugin {
         pluginManager.registerEvents(new BarrelBreakEvent(this), this);
         pluginManager.registerEvents(new BarrelPlaceEvent(this), this);
         pluginManager.registerEvents(new StorageClickEvent(this), this);
-        pluginManager.registerEvents(new StorageInventoryClickEvent(this), this);
-        pluginManager.registerEvents(new StorageInventoryOpenEvent(this), this);
     }
 
     private void setupCommands() {
@@ -69,17 +69,38 @@ public final class UltimateStoragePlus extends JavaPlugin {
     }
 
 
+
+
+//    public void put(Barrel barrel, ItemStack item) {
+//        Inventory inv = barrel.getInventory();
+//        PersistentDataContainer container = barrel.getPersistentDataContainer();
+//        NamespacedKey key = new NamespacedKey(this, "amount");
+//
+//        // Nouvel item
+//        if(inv.getItem(0).getType() == Material.AIR) {
+//            container.set(key, PersistentDataType.INTEGER, item.getAmount());
+//            item.setAmount(1);
+//            inv.setItem(0, item);
+//            return;
+//        }
+//
+//        if(!inv.getItem(0).isSimilar(item)) {
+//            return;
+//        }
+//
+//        Integer amount = container.get(key, PersistentDataType.INTEGER);
+//        amount += item.getAmount();
+//
+//        container.set(key, PersistentDataType.INTEGER, amount);
+//    }
     //config messages
+
     public String getPluginPrefix() {
         return this.pluginPrefix;
     }
 
     public String getPlayerNoPermission() {
         return ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("PlayerNoPermission"));
-    }
-
-    public String getCommandUsage() {
-        return ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("CommandUsage"));
     }
 
     public String getMustBePlayer() {

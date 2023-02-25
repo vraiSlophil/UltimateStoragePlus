@@ -7,7 +7,6 @@ import fr.slophil.ultimatestorageplus.entities.repository.Repositories;
 import fr.slophil.ultimatestorageplus.utils.BlockType;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -21,7 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.sql.SQLException;
 
-public class BarrelPlaceEvent  implements Listener {
+public class BarrelPlaceEvent implements Listener {
 
     private final UltimateStoragePlus ultimateStoragePlus;
 
@@ -29,25 +28,26 @@ public class BarrelPlaceEvent  implements Listener {
         this.ultimateStoragePlus = ultimateStoragePlus;
     }
 
+    /**
+     * Event called when a barrel is placed
+     */
     @EventHandler
-    public void onBarrelPlace(BlockPlaceEvent event){
+    public void onBarrelPlace(BlockPlaceEvent event) {
         Block block = event.getBlockPlaced();
         Location blockLocation = block.getLocation();
         ItemStack item = event.getItemInHand();
 
-        if(block.getType() != Material.BARREL) {
+        if ((block.getType() != Material.BARREL)
+                || (item.getType() != Material.BARREL)) {
             return;
         }
 
-        if (item.getType() != Material.BARREL) {
+        if (!(item.hasItemMeta())) {
             return;
         }
 
-        if(!(item.hasItemMeta())) {
-            return;
-        }
-
-        if (!(block.getState() instanceof TileState || block.getState() instanceof InventoryHolder)) {
+        if (!(block.getState() instanceof TileState
+                || block.getState() instanceof InventoryHolder)) {
             return;
         }
 
@@ -55,7 +55,12 @@ public class BarrelPlaceEvent  implements Listener {
         PersistentDataContainer blockContainer = blockState.getPersistentDataContainer();
         PersistentDataContainer itemContainer = item.getItemMeta().getPersistentDataContainer();
 
-        if (itemContainer.has(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER)){
+        /**
+         * Condition to check if the barrel is a storage barrel
+         * If it is, we save the location of the barrel in the database
+         */
+
+        if (itemContainer.has(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER)) {
             InventoryHolder holder = (Barrel) block.getState();
 
             PlacedStorageRepository repository = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
@@ -66,10 +71,6 @@ public class BarrelPlaceEvent  implements Listener {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
-//            new Storage(ultimateStoragePlus, blockLocation, itemContainer.get(key, PersistentDataType.INTEGER), holder);
-//            blockContainer.set(key, PersistentDataType.INTEGER, itemContainer.get(key, PersistentDataType.INTEGER));
-//            blockState.update();
         }
     }
 }

@@ -29,7 +29,6 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
                     blockZ INT(255) NOT NULL,
                     blockWorld TEXT NOT NULL,
                     PRIMARY KEY (blockX, blockY, blockZ, blockWorld)
-                    
                 );
                 """);
         create.execute();
