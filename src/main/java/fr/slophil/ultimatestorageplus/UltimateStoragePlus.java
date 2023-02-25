@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.logging.Level;
 
 public final class UltimateStoragePlus extends JavaPlugin {
-    private RecipeManager recipeManager;
+
+
+    public static final NamespacedKey STORAGE_KEY = new NamespacedKey("ULTIMATESTORAGEPLUS", "persistent_storage");
 
 //    private GuiManager guiManager;
+    private SQLiteConnector connector;
 
     private static UltimateStoragePlus instance;
 
@@ -69,8 +72,10 @@ public final class UltimateStoragePlus extends JavaPlugin {
         return instance;
     }
 
-    public RecipeManager getRecipeManager() {
-        return this.recipeManager;
+
+    //config messages
+    public String getPluginPrefix() {
+        return this.pluginPrefix;
     }
 
     public String getPlayerNoPermission() {

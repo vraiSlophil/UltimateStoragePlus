@@ -2,9 +2,6 @@ package fr.slophil.ultimatestorageplus.events;
 
 
 import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
-import fr.slophil.ultimatestorageplus.utils.GuiManager;
-import fr.slophil.ultimatestorageplus.utils.ItemBuilder;
-import fr.slophil.ultimatestorageplus.utils.Storage;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,8 +9,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class StorageInventoryOpenEvent implements Listener {
 
@@ -48,6 +43,7 @@ public class StorageInventoryOpenEvent implements Listener {
 
         Storage storage = ultimateStoragePlus.getStorageList().get(location);
         GuiManager customInventory = ultimateStoragePlus.getStorageInventoryList().get(storage);
+
 
 //        int amount = storage.getAmount();
 //        int stack = 64;

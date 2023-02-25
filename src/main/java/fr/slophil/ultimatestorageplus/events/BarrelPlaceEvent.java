@@ -1,7 +1,10 @@
 package fr.slophil.ultimatestorageplus.events;
 
 import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
-import fr.slophil.ultimatestorageplus.utils.Storage;
+import fr.slophil.ultimatestorageplus.entities.data.PlacedStorage;
+import fr.slophil.ultimatestorageplus.entities.repository.PlacedStorageRepository;
+import fr.slophil.ultimatestorageplus.entities.repository.Repositories;
+import fr.slophil.ultimatestorageplus.utils.BlockType;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -11,11 +14,12 @@ import org.bukkit.block.TileState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.sql.SQLException;
 
 public class BarrelPlaceEvent  implements Listener {
 
@@ -50,9 +54,8 @@ public class BarrelPlaceEvent  implements Listener {
         TileState blockState = (TileState) block.getState();
         PersistentDataContainer blockContainer = blockState.getPersistentDataContainer();
         PersistentDataContainer itemContainer = item.getItemMeta().getPersistentDataContainer();
-        NamespacedKey key = ultimateStoragePlus.getRecipeManager().getKey();
 
-        if (itemContainer.has(key, PersistentDataType.INTEGER)){
+        if (itemContainer.has(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER)){
             InventoryHolder holder = (Barrel) block.getState();
 
             PlacedStorageRepository repository = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
