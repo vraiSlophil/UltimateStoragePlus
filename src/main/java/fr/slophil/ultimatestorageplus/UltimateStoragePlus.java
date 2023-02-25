@@ -18,7 +18,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
     public static final NamespacedKey STORAGE_KEY = new NamespacedKey("ULTIMATESTORAGEPLUS", "persistent_storage");
 
-//    private StorageInventory guiManager;
+    //    private StorageInventory guiManager;
     private SQLiteConnector connector;
 
     private static UltimateStoragePlus instance;
@@ -68,31 +68,6 @@ public final class UltimateStoragePlus extends JavaPlugin {
         return instance;
     }
 
-
-
-
-//    public void put(Barrel barrel, ItemStack item) {
-//        Inventory inv = barrel.getInventory();
-//        PersistentDataContainer container = barrel.getPersistentDataContainer();
-//        NamespacedKey key = new NamespacedKey(this, "amount");
-//
-//        // Nouvel item
-//        if(inv.getItem(0).getType() == Material.AIR) {
-//            container.set(key, PersistentDataType.INTEGER, item.getAmount());
-//            item.setAmount(1);
-//            inv.setItem(0, item);
-//            return;
-//        }
-//
-//        if(!inv.getItem(0).isSimilar(item)) {
-//            return;
-//        }
-//
-//        Integer amount = container.get(key, PersistentDataType.INTEGER);
-//        amount += item.getAmount();
-//
-//        container.set(key, PersistentDataType.INTEGER, amount);
-//    }
     //config messages
 
     public String getPluginPrefix() {

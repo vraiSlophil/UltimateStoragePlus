@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -44,13 +45,10 @@ public class StorageInventory implements Listener, InventoryHolder {
         this.pullMode = false;
 
         this.storedItem = inventoryHolder.getInventory().getItem(0);
-        this.storedQuantity = inventoryHolder.getInventory().getItem(0).getItemMeta().getPersistentDataContainer()
-                .get(this.INVENTORY_KEY, PersistentDataType.INTEGER);
-        this.maxQuantity = blockType.getItem().getItemMeta().getPersistentDataContainer()
-                .get(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER);
+        this.storedQuantity = inventoryHolder.getInventory().getItem(0).getItemMeta().getPersistentDataContainer().get(INVENTORY_KEY, PersistentDataType.INTEGER);
+        this.maxQuantity = blockType.getItem().getItemMeta().getPersistentDataContainer().get(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER);
 
-        this.inventory = Bukkit.createInventory(null, this.inventorySize,
-                ChatColor.YELLOW + "Ultimate Storage - " + this.maxQuantity + "capacity");
+        this.inventory = Bukkit.createInventory(null, this.inventorySize, ChatColor.YELLOW + "Ultimate Storage - " + this.maxQuantity + "capacity");
     }
 
     /**
@@ -66,12 +64,15 @@ public class StorageInventory implements Listener, InventoryHolder {
 
     public void updateInventory() {
 
-        // On ajoute les items stockés dans l'inventaire custom en mode "drop"
         if (this.dropMode) {
-            int slot = 0; // On commence à la première case de la première ligne
-            while (this.storedQuantity > 0 && slot < 27) { // Tant qu'on a des items à ajouter et qu'on est dans l'inventaire custom
+            int slot = 0;
+            while (this.storedQuantity > 0 && slot < 27) {
                 ItemStack itemStack = new ItemStack(this.storedItem);
-                int quantityToAdd = Math.min(this.storedQuantity, this.storedItem.getMaxStackSize()); // On ajoute un stack complet si possible, sinon on ajoute ce qu'il reste
+
+                PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
+                container.remove(INVENTORY_KEY);
+
+                int quantityToAdd = Math.min(this.storedQuantity, this.storedItem.getMaxStackSize());
                 itemStack.setAmount(quantityToAdd);
                 this.inventory.setItem(slot, itemStack);
                 this.storedQuantity -= quantityToAdd;
@@ -79,7 +80,6 @@ public class StorageInventory implements Listener, InventoryHolder {
             }
         }
 
-        // On ajoute les paramètres de l'inventaire custom dans la dernière ligne
         for (int i = 27; i < 36; i++) {
             this.inventory.setItem(i, new ItemBuilder(Material.BARRIER).setDisplayName(ChatColor.BLACK + "").setGlow(true).build());
         }
@@ -87,13 +87,13 @@ public class StorageInventory implements Listener, InventoryHolder {
         lore.add(ChatColor.GRAY + "Stocked item : " + (this.storedItem == null ? "anything" : this.storedItem.getType().toString()));
         lore.add(ChatColor.GRAY + "Quantity : " + this.storedQuantity + " / " + this.maxQuantity);
         ItemStack barrel = new ItemBuilder(Material.BARREL).setDisplayName(ChatColor.YELLOW + "Ultimate Storage - " + this.maxQuantity + "capacity").setLore(lore).build();
-        this.inventory.setItem(30, barrel); // On affiche le tonneau de stockage
-        if (this.pullMode) { // Si on est en mode "pull"
+        this.inventory.setItem(30, barrel);
+        if (this.pullMode) {
             ItemStack pullItem = new ItemBuilder(Material.CHEST).setDisplayName(ChatColor.YELLOW + "Mode pull").build();
-            this.inventory.setItem(32, pullItem); // On affiche le bouton pour activer le mode "pull"
-        } else { // Si on est en mode "drop"
+            this.inventory.setItem(32, pullItem);
+        } else {
             ItemStack dropItem = new ItemBuilder(Material.HOPPER).setDisplayName(ChatColor.YELLOW + "Mode drop").build();
-            this.inventory.setItem(32, dropItem); // On affiche le bouton pour activer le mode "drop"
+            this.inventory.setItem(32, dropItem);
         }
     }
 
@@ -103,73 +103,119 @@ public class StorageInventory implements Listener, InventoryHolder {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.getInventory().equals(this.inventory)) { // Si l'événement concerne l'inventaire custom
+        if (!(event.getInventory().equals(this.inventory) || event.getInventory().equals(event.getWhoClicked().getInventory()))) {
             return;
         }
-        event.setCancelled(true); // On empêche l'interaction avec l'inventaire normal du joueur
+        event.setCancelled(true);
         ItemStack currentItem = event.getCurrentItem();
         if (currentItem == null || currentItem.getType() == Material.AIR) {
-            return; // Si l'item cliqué est vide, on ne fait rien
+            return;
         }
-        if (event.getRawSlot() >= 27) { // Si l'item cliqué est dans la dernière ligne
-            if (event.getRawSlot() == 32) { // Si on a cliqué sur le bouton pour changer de mode
+        if (event.getRawSlot() >= 27) {
+            if (event.getRawSlot() == 32) {
                 this.dropMode = !this.dropMode;
                 this.pullMode = !this.pullMode;
-                updateInventory(); // On met à jour l'inventaire custom pour afficher le nouveau mode
+                updateInventory();
             }
-            return; // On ne fait rien d'autre si on a cliqué sur un bouton de la dernière ligne
+            return;
         }
-        // On ajoute ou on retire des items du stockage selon le mode et l'action effectuée
-        if (this.dropMode && currentItem.isSimilar(this.storage.getStoredItem())) {
+        if (this.dropMode && currentItem.isSimilar(this.storedItem)) {
             int quantityToAdd = currentItem.getAmount();
-            int quantityAdded = storage.addItems(quantityToAdd, currentItem);
+            int quantityAdded = this.addItems(quantityToAdd, currentItem);
             currentItem.setAmount(quantityToAdd - quantityAdded);
         } else if (this.pullMode) {
             int quantityToRemove = currentItem.getAmount();
-            int quantityRemoved = storage.removeItems(quantityToRemove);
+            int quantityRemoved = this.removeItems(quantityToRemove);
             if (quantityRemoved > 0) {
-                ItemStack itemStack = storage.getStoredItem();
+                ItemStack itemStack = this.storedItem;
                 itemStack.setAmount(quantityRemoved);
                 Player player = (Player) event.getWhoClicked();
                 player.getInventory().addItem(itemStack);
             }
         }
-        updateInventory(); // On met à jour l'inventaire custom après l'interaction.
+        updateInventory();
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!event.getInventory().equals(this.inventory)) { // Si l'événement concerne l'inventaire custom
+        if (!event.getInventory().equals(this.inventory)) {
             return;
         }
-        event.setCancelled(true); // On empêche l'interaction avec l'inventaire normal du joueur
+        event.setCancelled(true);
         Map<Integer, ItemStack> draggedItems = event.getNewItems();
         if (draggedItems.isEmpty()) {
-            return; // Si aucun item n'a été déplacé, on ne fait rien
+            return;
         }
         int quantityMoved = 0;
         for (ItemStack item : draggedItems.values()) {
-            if (item.isSimilar(storage.getStoredItem())) {
+            if (item.isSimilar(this.storedItem)) {
                 quantityMoved += item.getAmount();
             }
         }
         if (this.dropMode) {
-            int quantityAdded = storage.addItems(quantityMoved, draggedItems.get(0));
+            int quantityAdded = this.addItems(quantityMoved, draggedItems.get(0));
             if (quantityAdded < quantityMoved) {
                 quantityMoved = quantityAdded;
             }
         } else if (this.pullMode) {
-            int quantityRemoved = storage.removeItems(quantityMoved);
+            int quantityRemoved = this.removeItems(quantityMoved);
             if (quantityRemoved < quantityMoved) {
                 quantityMoved = quantityRemoved;
             }
-            ItemStack itemStack = new ItemStack(storage.getStoredItem());
+            ItemStack itemStack = new ItemStack(this.storedItem);
             itemStack.setAmount(quantityMoved);
             Player player = (Player) event.getWhoClicked();
             player.getInventory().addItem(itemStack);
         }
-        updateInventory(); // On met à jour l'inventaire custom après le déplacement d'items
+        updateInventory();
     }
+
+    public int put(int quantity, ItemStack itemStack) {
+        Inventory inv = this.inventoryHolder.getInventory();
+        PersistentDataContainer container = inv.getItem(0).getItemMeta().getPersistentDataContainer();
+
+        ItemStack itemStackToAdd = itemStack.clone();
+        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
+
+        if (storedItem == null || storedItem.getType() == Material.AIR) {
+            itemStack.setAmount(1);
+            inv.setItem(0, itemStack);
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
+            return 0;
+        } else if (!storedItem.isSimilar(itemStackToAdd)) {
+            return quantity;
+        }
+
+        storedQuantity += quantity;
+        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
+
+        if (storedQuantity > maxQuantity) {
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, (storedQuantity - maxQuantity));
+            return storedQuantity - maxQuantity;
+        }
+        return 0;
+    }
+
+    public int removeItems(int quantity) {
+        if (storedQuantity == 0) {
+            return quantity;
+        }
+
+        storedQuantity -= quantity;
+        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
+
+        if (storedQuantity < 0) {
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, ((-1) * storedQuantity));
+            return (-1) * storedQuantity;
+        }
+
+        if (storedQuantity == 0) {
+            storedItem = null;
+        }
+
+        return 0;
+    }
+
 
 }
 
