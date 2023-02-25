@@ -37,12 +37,12 @@ public class StorageInventoryOpenEvent implements Listener {
 
         Location location = ((BlockInventoryHolder) inventoryHolder).getBlock().getLocation();
 
-        if (!ultimateStoragePlus.getStorageList().containsKey(location)) {
-            return;
-        }
-
-        Storage storage = ultimateStoragePlus.getStorageList().get(location);
-        GuiManager customInventory = ultimateStoragePlus.getStorageInventoryList().get(storage);
+//        if (!ultimateStoragePlus.getStorageList().containsKey(location)) {
+//            return;
+//        }
+//
+//        Storage storage = ultimateStoragePlus.getStorageList().get(location);
+//        GuiManager customInventory = ultimateStoragePlus.getStorageInventoryList().get(storage);
 
 
 //        int amount = storage.getAmount();

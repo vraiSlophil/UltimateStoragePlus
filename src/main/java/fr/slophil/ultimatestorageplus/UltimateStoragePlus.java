@@ -3,16 +3,12 @@ package fr.slophil.ultimatestorageplus;
 import fr.slophil.ultimatestorageplus.commands.UltimateStoragePlusCommand;
 import fr.slophil.ultimatestorageplus.events.*;
 import fr.slophil.ultimatestorageplus.utils.BlockType;
-import fr.slophil.ultimatestorageplus.utils.GuiManager;
 import fr.slophil.ultimatestorageplus.utils.SQLiteConnector;
-import fr.slophil.ultimatestorageplus.utils.Storage;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
 import java.util.logging.Level;
 
 public final class UltimateStoragePlus extends JavaPlugin {

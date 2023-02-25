@@ -28,7 +28,6 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
                     blockY INT(255) NOT NULL,
                     blockZ INT(255) NOT NULL,
                     blockWorld TEXT NOT NULL,
-                    blockType TEXT NOT NULL,
                     PRIMARY KEY (blockX, blockY, blockZ, blockWorld)
                     
                 );
@@ -50,7 +49,7 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
     @Override
     public void save(PlacedStorage entity) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement("""
-                INSERT INTO BlockCoordinates(blockX, blockY, blockZ, world, blockType) VALUES (
+                INSERT INTO BlockCoordinates(blockX, blockY, blockZ, blockWorld, blockType) VALUES (
                     ?, ?, ?, ?, ?
                 );
                 """);
@@ -77,7 +76,7 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
                     blockX = ? AND
                     blockY = ? AND
                     blockZ = ? AND
-                    world = ?
+                    blockWorld = ?
                 ;
                 """);
 
@@ -96,7 +95,7 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
                     blockX = ? AND
                     blockY = ? AND
                     blockZ = ? AND
-                    world = ?
+                    blockWorld = ?
                 ;
                 """);
 
