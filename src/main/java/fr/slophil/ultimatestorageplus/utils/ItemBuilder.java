@@ -1,42 +1,47 @@
 package fr.slophil.ultimatestorageplus.utils;
 
-import java.util.ArrayList;
-
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.ArrayList;
 
 public class ItemBuilder {
 
     private ItemStack stack;
 
+    /**
+     * Constructor
+     *
+     * @param mat Material of the item
+     */
     public ItemBuilder(Material mat) {
         stack = new ItemStack(mat);
     }
 
+    /**
+     * This method is used to get the ItemMeta of the item
+     *
+     * @return ItemMeta of the item
+     */
     public ItemMeta getItemMeta() {
         return stack.getItemMeta();
     }
 
-    public ItemBuilder setColor(Color color) {
-        LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-        meta.setColor(color);
-        setItemMeta(meta);
-        return this;
-    }
-
+    /**
+     * This method is used to add a glow effect to the item
+     *
+     * @param glow true if you want to add a glow effect, false if you want to remove it
+     * @return ItemBuilder
+     */
     public ItemBuilder setGlow(boolean glow) {
         if (glow) {
-            addEnchant(Enchantment.SILK_TOUCH, 1);
+            addEnchant(Enchantment.FROST_WALKER, 1);
             addItemFlag(ItemFlag.HIDE_ENCHANTS);
         } else {
             ItemMeta meta = getItemMeta();
@@ -47,30 +52,23 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setUnbreakable(boolean unbreakable) {
-        ItemMeta meta = stack.getItemMeta();
-        meta.setUnbreakable(unbreakable);
-        stack.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilder setAmount(int amount) {
-        stack.setAmount(amount);
-        return this;
-    }
-
+    /**
+     * This method is used to set the ItemMeta of the item
+     *
+     * @param meta new ItemMeta of item
+     * @return ItemBuilder
+     */
     public ItemBuilder setItemMeta(ItemMeta meta) {
         stack.setItemMeta(meta);
         return this;
     }
 
-    public ItemBuilder setHead(OfflinePlayer owner) {
-        SkullMeta meta = (SkullMeta) stack.getItemMeta();
-        meta.setOwningPlayer(owner);
-        setItemMeta(meta);
-        return this;
-    }
-
+    /**
+     * This method is used to set the display name of the item
+     *
+     * @param displayname new displayed name of the item
+     * @return ItemBuilder
+     */
     public ItemBuilder setDisplayName(String displayname) {
         ItemMeta meta = getItemMeta();
         meta.setDisplayName(displayname);
@@ -78,11 +76,12 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setItemStack(ItemStack stack) {
-        this.stack = stack;
-        return this;
-    }
-
+    /**
+     * This method is used to set the lore of the item
+     *
+     * @param lore new lore of the item
+     * @return ItemBuilder
+     */
     public ItemBuilder setLore(ArrayList<String> lore) {
         ItemMeta meta = getItemMeta();
         meta.setLore(lore);
@@ -90,15 +89,13 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setLore(String lore) {
-        ArrayList<String> loreList = new ArrayList<>();
-        loreList.add(lore);
-        ItemMeta meta = getItemMeta();
-        meta.setLore(loreList);
-        setItemMeta(meta);
-        return this;
-    }
-
+    /**
+     * This method is used to add an enchantment to the item
+     *
+     * @param enchantment enchantment to add
+     * @param level       level of the enchantment
+     * @return ItemBuilder
+     */
     public ItemBuilder addEnchant(Enchantment enchantment, int level) {
         ItemMeta meta = getItemMeta();
         meta.addEnchant(enchantment, level, true);
@@ -106,6 +103,12 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * This method is used to add an item flag to the item
+     *
+     * @param flag item flag to add
+     * @return ItemBuilder
+     */
     public ItemBuilder addItemFlag(ItemFlag flag) {
         ItemMeta meta = getItemMeta();
         meta.addItemFlags(flag);
@@ -113,6 +116,14 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * Thismethod is used to add a PersistentDataContainer to the item
+     *
+     * @param namespacedKey      NamespacedKey of the PersistentDataContainer
+     * @param persistentDataType PersistentDataType of the PersistentDataContainer
+     * @param value              value of the PersistentDataContainer
+     * @return
+     */
     public ItemBuilder setPersistentDataContainer(NamespacedKey namespacedKey, PersistentDataType persistentDataType, Integer value) {
 
         ItemMeta meta = getItemMeta();
@@ -126,6 +137,12 @@ public class ItemBuilder {
         return this;
     }
 
+    /**
+     * This method is used to build the item
+     * You have to use this method at the end of the creation of your ItemBuilder
+     *
+     * @return ItemStack
+     */
     public ItemStack build() {
         return stack;
     }

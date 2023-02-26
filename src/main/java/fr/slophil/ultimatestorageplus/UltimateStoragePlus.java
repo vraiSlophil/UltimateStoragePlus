@@ -3,7 +3,7 @@ package fr.slophil.ultimatestorageplus;
 import fr.slophil.ultimatestorageplus.commands.UltimateStoragePlusCommand;
 import fr.slophil.ultimatestorageplus.events.BarrelBreakEvent;
 import fr.slophil.ultimatestorageplus.events.BarrelPlaceEvent;
-import fr.slophil.ultimatestorageplus.events.StorageClickEvent;
+import fr.slophil.ultimatestorageplus.events.BarrelClickEvent;
 import fr.slophil.ultimatestorageplus.utils.BlockType;
 import fr.slophil.ultimatestorageplus.utils.SQLiteConnector;
 import org.bukkit.ChatColor;
@@ -53,7 +53,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
         pluginManager.registerEvents(new BarrelBreakEvent(this), this);
         pluginManager.registerEvents(new BarrelPlaceEvent(this), this);
-        pluginManager.registerEvents(new StorageClickEvent(this), this);
+        pluginManager.registerEvents(new BarrelClickEvent(this), this);
     }
 
     private void setupCommands() {
@@ -80,5 +80,9 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
     public String getMustBePlayer() {
         return ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("MustBePlayer"));
+    }
+
+    public String getCommandUsage() {
+        return ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("CommandUsage"));
     }
 }

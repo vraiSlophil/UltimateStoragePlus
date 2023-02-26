@@ -28,22 +28,17 @@ public class UltimateStoragePlusCommand implements TabExecutor {
                 player.sendMessage(main.getPluginPrefix() + main.getPlayerNoPermission());
                 return false;
             }
-
             if (!(label.equalsIgnoreCase("ultimatestorageplus")
                     || label.equalsIgnoreCase("usp"))) {
                 return false;
             }
-
             if (args.length < 1) {
                 return false;
             }
-
             if (args[0].equalsIgnoreCase("give")) {
-
                 if (args.length < 2) {
                     return false;
                 }
-
                 Stream.of(BlockType.values())
                         .filter(recipe -> recipe.name().equalsIgnoreCase(args[1]))
                         .findFirst()
@@ -54,7 +49,6 @@ public class UltimateStoragePlusCommand implements TabExecutor {
                         );
                 return false;
             }
-
         } else {
             main.getLogger().log(Level.INFO, main.getMustBePlayer());
             return false;
@@ -62,37 +56,30 @@ public class UltimateStoragePlusCommand implements TabExecutor {
         return false;
     }
 
-
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> toReturn = new ArrayList<>();
-
         if (args.length == 1) {
             List<String> firstLevel = new ArrayList<>(List.of("give"));
-
             for (String element : firstLevel) {
                 if (element.startsWith(args[0].toLowerCase())) {
                     toReturn.add(element);
                 }
             }
         }
-
         if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
             List<String> secondLevel = Stream.of(BlockType.values())
                     .map(recipe -> recipe.name().toLowerCase())
                     .toList();
-
             for (String element : secondLevel) {
                 if (element.startsWith(args[1].toLowerCase())) {
                     toReturn.add(element);
                 }
             }
         }
-
         if (args.length > 2) {
             return Collections.emptyList();
         }
-
         return toReturn;
     }
 }

@@ -11,33 +11,23 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Cette classe permet de se connecter à une base de données SQLite.
- * La base de données sera créée dans le dossier du plugin si celui-ci existe,
- * sinon elle sera créée à la racine du projet.
+ * This class is used to connect to the SQLite database
  */
 public class SQLiteConnector {
     private Connection connection;
     private UltimateStoragePlus plugin;
 
-    /**
-     * Constructeur de la classe.
-     *
-     * @param ultimateStoragePlus L'instance du plugin
-     */
     public SQLiteConnector(UltimateStoragePlus ultimateStoragePlus) {
         this.plugin = ultimateStoragePlus;
     }
 
     /**
-     * Cette méthode permet de se connecter à la base de données SQLite.
-     * Elle vérifie au préalable si le dossier du plugin existe, si oui la base de données sera créée dedans,
-     * sinon elle sera créée à la racine du projet.
+     * Connect to the SQLite database
      *
-     * @return true si la connexion a réussi, false sinon
+     * @return true if the connection is successful, false otherwise
      */
     public boolean connect() {
         try {
-            // Vérification de l'existence du dossier du plugin
             Path dbFile = Path.of(plugin.getDataFolder().getAbsolutePath(), "UltimateStoragePlusDatabase.db");
             if (!Files.exists(dbFile.getParent())) {
                 Files.createDirectories(dbFile.getParent());
@@ -45,17 +35,11 @@ public class SQLiteConnector {
             if (!Files.exists(dbFile)) {
                 Files.createFile(dbFile);
             }
-
-            // Connexion à la base de données
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.toAbsolutePath());
-
             for (Repositories repository : Repositories.values()) {
                 repository.getRepository().hydrate(connection);
                 repository.getRepository().create();
             }
-
-
-
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -66,9 +50,9 @@ public class SQLiteConnector {
     }
 
     /**
-     * Cette méthode permet de fermer la connexion à la base de données.
+     * Disconnect from the SQLite database
      *
-     * @return true si la fermeture a réussi, false sinon
+     * @return true if the disconnection is successful, false otherwise
      */
     public boolean disconnect() {
         try {
@@ -83,9 +67,9 @@ public class SQLiteConnector {
     }
 
     /**
-     * Cette méthode permet de récupérer la connexion à la base de données.
+     * Get the connection to the SQLite database
      *
-     * @return la connexion à la base de données
+     * @return the connection to the SQLite database
      */
     public Connection getConnection() {
         return connection;

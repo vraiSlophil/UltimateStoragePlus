@@ -19,11 +19,11 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 
-public class StorageClickEvent implements Listener {
+public class BarrelClickEvent implements Listener {
 
     private final UltimateStoragePlus ultimateStoragePlus;
 
-    public StorageClickEvent(UltimateStoragePlus ultimateStoragePlus) {
+    public BarrelClickEvent(UltimateStoragePlus ultimateStoragePlus) {
         this.ultimateStoragePlus = ultimateStoragePlus;
     }
 

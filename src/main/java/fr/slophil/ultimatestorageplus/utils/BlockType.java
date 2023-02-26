@@ -231,12 +231,28 @@ public enum BlockType {
                     .setIngredient('E', Material.EMERALD_BLOCK)
                     .setIngredient('I', Material.IRON_BLOCK)
                     .setIngredient('R', Material.REDSTONE_BLOCK)
+    ),
+    STORAGE_256M(
+            new ItemBuilder(Material.BARREL)
+                    .setPersistentDataContainer(STORAGE_KEY, PersistentDataType.INTEGER, 268435456)
+                    .setDisplayName(ChatColor.GOLD + "Ultimate Storage - 268,435,456 capacity")
+                    .setGlow(true).build(),
+            (recipe) -> recipe
+                    .shape("BEB", "IRI", "BEB")
+                    .setIngredient('B', new RecipeChoice.MaterialChoice.ExactChoice(STORAGE_128M.item))
+                    .setIngredient('E', Material.EMERALD_BLOCK)
+                    .setIngredient('I', Material.IRON_BLOCK)
+                    .setIngredient('R', Material.REDSTONE_BLOCK)
     );
 
     private final ItemStack item;
     private final ShapedRecipe recipe;
     private final NamespacedKey key;
 
+    /**
+     * @param item           The item to be used in the recipe
+     * @param recipeProvider A function that takes a ShapedRecipe and returns a ShapedRecipe
+     */
     BlockType(ItemStack item, UnaryOperator<ShapedRecipe> recipeProvider) {
         UltimateStoragePlus ultimateStoragePlus = UltimateStoragePlus.getInstance();
         this.item = item;
@@ -244,20 +260,32 @@ public enum BlockType {
         this.recipe = recipeProvider.apply(new ShapedRecipe(key, item));
     }
 
+    /**
+     * Registers all recipes
+     */
     public static void registerRecipes() {
         for (BlockType recipe : values()) {
             Bukkit.addRecipe(recipe.recipe);
         }
     }
 
+    /**
+     * @return The ItemStack of the item
+     */
     public ItemStack getItem() {
         return item;
     }
 
+    /**
+     * @return The NamespacedKey of the item
+     */
     public NamespacedKey getKey() {
         return key;
     }
 
+    /**
+     * @return The ShapedRecipe of the item
+     */
     public ShapedRecipe getRecipe() {
         return recipe;
     }

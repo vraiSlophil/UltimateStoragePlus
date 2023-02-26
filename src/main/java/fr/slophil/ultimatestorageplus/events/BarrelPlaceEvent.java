@@ -55,11 +55,6 @@ public class BarrelPlaceEvent implements Listener {
         PersistentDataContainer blockContainer = blockState.getPersistentDataContainer();
         PersistentDataContainer itemContainer = item.getItemMeta().getPersistentDataContainer();
 
-        /**
-         * Condition to check if the barrel is a storage barrel
-         * If it is, we save the location of the barrel in the database
-         */
-
         if (itemContainer.has(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER)) {
             InventoryHolder holder = (Barrel) block.getState();
 

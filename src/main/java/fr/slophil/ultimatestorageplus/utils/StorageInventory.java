@@ -52,7 +52,7 @@ public class StorageInventory implements Listener, InventoryHolder {
     }
 
     /**
-     * This function is used to open the inventory to the player
+     * This method is used to open the inventory to the player
      *
      * @param player the player who will open the inventory
      * @return nothing
@@ -62,6 +62,11 @@ public class StorageInventory implements Listener, InventoryHolder {
         player.openInventory(this.inventory);
     }
 
+    /**
+     * This method is used to update the inventory
+     *
+     * @return nothing
+     */
     public void updateInventory() {
 
         if (this.dropMode) {
@@ -97,8 +102,81 @@ public class StorageInventory implements Listener, InventoryHolder {
         }
     }
 
+    /**
+     * This method is used to get the inventory of this class
+     *
+     * @return the inventory of this class
+     */
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    /**
+     * This methodis used to add ItemStack to the StorageInventory
+     *
+     * @param quantity  the quantity of ItemStack to add
+     * @param itemStack the ItemStack to add
+     * @return
+     */
+    public int addItems(int quantity, ItemStack itemStack) {
+        Inventory inv = this.inventoryHolder.getInventory();
+        PersistentDataContainer container = inv.getItem(0).getItemMeta().getPersistentDataContainer();
+        ItemStack itemStackToAdd = itemStack.clone();
+        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
+        if (storedItem == null || storedItem.getType() == Material.AIR) {
+            itemStack.setAmount(1);
+            inv.setItem(0, itemStack);
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
+            return 0;
+        } else if (!storedItem.isSimilar(itemStackToAdd)) {
+            return quantity;
+        }
+        storedQuantity += quantity;
+        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
+        if (storedQuantity > maxQuantity) {
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, (storedQuantity - maxQuantity));
+            return storedQuantity - maxQuantity;
+        }
+        return 0;
+    }
+
+    public int removeItems(int quantity) {
+        if (storedQuantity == 0) {
+            return quantity;
+        }
+        storedQuantity -= quantity;
+        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
+        if (storedQuantity < 0) {
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, ((-1) * storedQuantity));
+            return (-1) * storedQuantity;
+        }
+        if (storedQuantity == 0) {
+            storedItem = null;
+        }
+        return 0;
+    }
+
+    /**
+     * This method is used to fill the player inventory and to not duplicate lines of code
+     *
+     * @param itemStackToAdd  ItemStack to add
+     * @param quantityMoved   quantity of the ItemStack to add
+     * @param playerInventory player inventory in which we will add the ItemStack
+     */
+    private void fillPlayerInventory(ItemStack itemStackToAdd, int quantityMoved, Inventory playerInventory) {
+        int stackSize = itemStackToAdd.getMaxStackSize();
+        int stackToAddBack = quantityMoved / stackSize;
+        // if quantityMoved = 128, stackToAddBack = 2. Because there is 2 stacks
+        itemStackToAdd.setAmount(stackSize);
+        for (int i = 0; i < stackToAddBack; i++) {
+            playerInventory.addItem(itemStackToAdd);
+        }
+        itemStackToAdd.setAmount(1);
+        int itemToAddBack = quantityMoved % stackSize;
+        // if quantityMoved = 89, itemToAddBack = 1. Because there is 1 stack and 1 item of 25 units
+        for (int i = 0; i < itemToAddBack; i++) {
+            playerInventory.addItem(itemStackToAdd);
+        }
     }
 
     @EventHandler
@@ -119,26 +197,30 @@ public class StorageInventory implements Listener, InventoryHolder {
             }
             return;
         }
-        if (this.dropMode && currentItem.isSimilar(this.storedItem)) {
-            int quantityToAdd = currentItem.getAmount();
-            int quantityAdded = this.addItems(quantityToAdd, currentItem);
-            currentItem.setAmount(quantityToAdd - quantityAdded);
-        } else if (this.pullMode) {
-            int quantityToRemove = currentItem.getAmount();
-            int quantityRemoved = this.removeItems(quantityToRemove);
-            if (quantityRemoved > 0) {
-                ItemStack itemStack = this.storedItem;
-                itemStack.setAmount(quantityRemoved);
-                Player player = (Player) event.getWhoClicked();
-                player.getInventory().addItem(itemStack);
+
+        ItemStack itemStackToAdd = this.storedItem.clone();
+        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
+
+        Inventory playerInventory = event.getWhoClicked().getInventory();
+        int quantityMoved = currentItem.getAmount();
+
+        if (this.dropMode) {
+            int quantityAdded = this.addItems(quantityMoved, itemStackToAdd);
+            if (quantityAdded > 0) {
+                quantityMoved -= quantityAdded;
+                this.fillPlayerInventory(itemStackToAdd, quantityMoved, playerInventory);
             }
+        } else if (this.pullMode) {
+            int quantityRemoved = this.removeItems(quantityMoved);
+            this.fillPlayerInventory(itemStackToAdd, quantityMoved, playerInventory);
         }
         updateInventory();
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!event.getInventory().equals(this.inventory)) {
+        Inventory playerInventory = event.getWhoClicked().getInventory();
+        if (!(event.getInventory().equals(this.inventory) || event.getInventory().equals(playerInventory))) {
             return;
         }
         event.setCancelled(true);
@@ -146,135 +228,24 @@ public class StorageInventory implements Listener, InventoryHolder {
         if (draggedItems.isEmpty()) {
             return;
         }
+        ItemStack itemStackToAdd = this.storedItem.clone();
+        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
         int quantityMoved = 0;
         for (ItemStack item : draggedItems.values()) {
-            if (item.isSimilar(this.storedItem)) {
+            if (item.isSimilar(itemStackToAdd)) {
                 quantityMoved += item.getAmount();
             }
         }
         if (this.dropMode) {
-            int quantityAdded = this.addItems(quantityMoved, draggedItems.get(0));
-            if (quantityAdded < quantityMoved) {
-                quantityMoved = quantityAdded;
+            int quantityAdded = this.addItems(quantityMoved, itemStackToAdd);
+            if (quantityAdded > 0) {
+                quantityMoved -= quantityAdded;
+                this.fillPlayerInventory(itemStackToAdd, quantityMoved, playerInventory);
             }
         } else if (this.pullMode) {
             int quantityRemoved = this.removeItems(quantityMoved);
-            if (quantityRemoved < quantityMoved) {
-                quantityMoved = quantityRemoved;
-            }
-            ItemStack itemStack = new ItemStack(this.storedItem);
-            itemStack.setAmount(quantityMoved);
-            Player player = (Player) event.getWhoClicked();
-            player.getInventory().addItem(itemStack);
+            this.fillPlayerInventory(itemStackToAdd, quantityMoved, playerInventory);
         }
         updateInventory();
     }
-
-    public int put(int quantity, ItemStack itemStack) {
-        Inventory inv = this.inventoryHolder.getInventory();
-        PersistentDataContainer container = inv.getItem(0).getItemMeta().getPersistentDataContainer();
-
-        ItemStack itemStackToAdd = itemStack.clone();
-        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
-
-        if (storedItem == null || storedItem.getType() == Material.AIR) {
-            itemStack.setAmount(1);
-            inv.setItem(0, itemStack);
-            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
-            return 0;
-        } else if (!storedItem.isSimilar(itemStackToAdd)) {
-            return quantity;
-        }
-
-        storedQuantity += quantity;
-        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
-
-        if (storedQuantity > maxQuantity) {
-            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, (storedQuantity - maxQuantity));
-            return storedQuantity - maxQuantity;
-        }
-        return 0;
-    }
-
-    public int removeItems(int quantity) {
-        if (storedQuantity == 0) {
-            return quantity;
-        }
-
-        storedQuantity -= quantity;
-        storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
-
-        if (storedQuantity < 0) {
-            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, ((-1) * storedQuantity));
-            return (-1) * storedQuantity;
-        }
-
-        if (storedQuantity == 0) {
-            storedItem = null;
-        }
-
-        return 0;
-    }
-
-
 }
-
-
-//public class StorageInventory {
-//
-//    private Storage owner;
-//    private Inventory inventory;
-//    private String state;
-//
-//    private final ItemStack pullItemStack = new ItemBuilder(Material.ENDER_PEARL).setDisplayName(ChatColor.YELLOW + "Pull").setGlow(true).build();
-//    private final ItemStack dropItemStack = new ItemBuilder(Material.ENDER_EYE).setDisplayName(ChatColor.YELLOW + "Drop").setGlow(true).build();
-//
-//    public StorageInventory(UltimateStoragePlus ultimateStoragePlus) {
-//    }
-//    public StorageInventory(Storage owner) {
-//        this.owner = owner;
-//        int rows = 4 * 9;
-//        Formatter cap = new Formatter();
-//        cap.format("%,d", owner.getCapacity());
-//        String title = "%sUltimate Storage - %s capacity".formatted(ChatColor.YELLOW, cap);
-//
-//        this.inventory = Bukkit.createInventory(owner.getInventoryHolder(), rows, title);
-//        setup(this.inventory, owner);
-//    }
-//
-//    private void setup(Inventory inventory, Storage owner) {
-//        for (int slot = 27; slot < 4*9; slot++) {
-//            inventory.setItem(slot, new ItemBuilder(Material.BARRIER).setDisplayName(ChatColor.BLACK + "").setGlow(true).build());
-//        }
-//
-//        if (owner.getItemStack() != null) {
-//            Formatter amount = new Formatter();
-//            amount.format("%,d", owner.getAmount());
-//            String name = "%sContains %s of %s".formatted(ChatColor.YELLOW, amount, owner.getItemStack().getType());
-//            inventory.setItem(28, new ItemBuilder(Material.MAP).setDisplayName(name).setGlow(true).build());
-//        }
-//        this.setState("pull");
-//
-//    }
-//
-//    public void setState(String state) {
-//        this.state = state;
-//        if (state.equals("drop")) {
-//            this.inventory.setItem(27, dropItemStack);
-//            return;
-//        }
-//        this.inventory.setItem(27, pullItemStack);
-//    }
-//
-//    public Inventory getInventory() {
-//        return this.inventory;
-//    }
-//
-//    public Storage getStorage(){
-//        return this.owner;
-//    }
-//
-//    public String getState() {
-//        return this.state;
-//    }
-//}

@@ -15,11 +15,21 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
 
     private Connection connection;
 
+    /**
+     * This method is used to hydrate the repository
+     *
+     * @param connection
+     */
     @Override
     public void hydrate(Connection connection) {
         this.connection = connection;
     }
 
+    /**
+     * This method is used to create the table
+     *
+     * @throws SQLException
+     */
     @Override
     public void create() throws SQLException {
         PreparedStatement create = connection.prepareStatement("""
@@ -36,6 +46,11 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
 
     }
 
+    /**
+     * This method is used to delete the table
+     *
+     * @throws SQLException
+     */
     @Override
     public void delete() throws SQLException {
         PreparedStatement delete = connection.prepareStatement("""
@@ -45,6 +60,12 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
         delete.close();
     }
 
+    /**
+     * This method is used to save an entity
+     *
+     * @param entity
+     * @throws SQLException
+     */
     @Override
     public void save(PlacedStorage entity) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement("""
@@ -63,11 +84,23 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
         stmt.close();
     }
 
+    /**
+     * This method is used to edit an entity
+     *
+     * @param entity
+     * @throws SQLException
+     */
     @Override
     public void edit(PlacedStorage entity) throws SQLException {
 
     }
 
+    /**
+     * This method is used to remove an entity
+     *
+     * @param entity
+     * @throws SQLException
+     */
     @Override
     public void remove(PlacedStorage entity) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement("""
@@ -88,6 +121,13 @@ public class PlacedStorageRepository implements Repository<PlacedStorage> {
         stmt.close();
     }
 
+    /**
+     * This method is used to get an entity by its location
+     *
+     * @param location
+     * @return
+     * @throws SQLException
+     */
     public Optional<PlacedStorage> getByLocation(Location location) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement("""
                 SELECT * FROM BlockCoordinates WHERE
