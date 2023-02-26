@@ -16,7 +16,7 @@ import java.util.logging.Level;
 public final class UltimateStoragePlus extends JavaPlugin {
 
 
-    public static final NamespacedKey STORAGE_KEY = new NamespacedKey("ULTIMATESTORAGEPLUS", "persistent_storage");
+    public static final NamespacedKey STORAGE_KEY = new NamespacedKey("ultimatestorageplus", "persistent_storage");
 
     //    private StorageInventory guiManager;
     private SQLiteConnector connector;
@@ -28,6 +28,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        this.instance = this;
         saveDefaultConfig();
         this.setup();
         this.registerEvents();

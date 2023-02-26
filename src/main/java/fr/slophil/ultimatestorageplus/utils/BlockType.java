@@ -254,9 +254,8 @@ public enum BlockType {
      * @param recipeProvider A function that takes a ShapedRecipe and returns a ShapedRecipe
      */
     BlockType(ItemStack item, UnaryOperator<ShapedRecipe> recipeProvider) {
-        UltimateStoragePlus ultimateStoragePlus = UltimateStoragePlus.getInstance();
         this.item = item;
-        this.key = new NamespacedKey(ultimateStoragePlus, name().toLowerCase());
+        this.key = new NamespacedKey(UltimateStoragePlus.getInstance(), name().toLowerCase());
         this.recipe = recipeProvider.apply(new ShapedRecipe(key, item));
     }
 
