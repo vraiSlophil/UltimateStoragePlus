@@ -6,6 +6,7 @@ import fr.slophil.ultimatestorageplus.events.BarrelPlaceEvent;
 import fr.slophil.ultimatestorageplus.events.BarrelClickEvent;
 import fr.slophil.ultimatestorageplus.utils.BlockType;
 import fr.slophil.ultimatestorageplus.utils.SQLiteConnector;
+import fr.slophil.ultimatestorageplus.utils.StorageInventory;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.PluginManager;
@@ -23,12 +24,12 @@ public final class UltimateStoragePlus extends JavaPlugin {
 
     private static UltimateStoragePlus instance;
 
-    private final String pluginPrefix = ChatColor.GOLD.toString() + ChatColor.BOLD.toString() +
-            getDescription().getName() + ChatColor.DARK_RED.toString() + " : ";
+    private final String pluginPrefix = ChatColor.GOLD.toString() + ChatColor.BOLD +
+            getDescription().getName() + ChatColor.DARK_RED + " : ";
 
     @Override
     public void onEnable() {
-        this.instance = this;
+        instance = this;
         saveDefaultConfig();
         this.setup();
         this.registerEvents();
@@ -55,6 +56,7 @@ public final class UltimateStoragePlus extends JavaPlugin {
         pluginManager.registerEvents(new BarrelBreakEvent(this), this);
         pluginManager.registerEvents(new BarrelPlaceEvent(this), this);
         pluginManager.registerEvents(new BarrelClickEvent(this), this);
+//        pluginManager.registerEvents(new StorageInventory(), this);
     }
 
     private void setupCommands() {
