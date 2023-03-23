@@ -276,6 +276,19 @@ public enum BlockType {
     }
 
     /**
+     * @param capacity The capacity of the item
+     * @return
+     */
+    public static BlockType getBlockType(int capacity) {
+        for (BlockType blockType : values()) {
+            if (blockType.getItem().getItemMeta().getPersistentDataContainer().get(STORAGE_KEY, PersistentDataType.INTEGER) == capacity) {
+                return blockType;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return The NamespacedKey of the item
      */
     public NamespacedKey getKey() {

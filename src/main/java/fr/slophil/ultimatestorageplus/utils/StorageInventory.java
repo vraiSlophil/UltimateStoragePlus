@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,17 +22,16 @@ import java.util.Map;
 public class StorageInventory implements Listener, InventoryHolder {
 
     private final static NamespacedKey INVENTORY_KEY = new NamespacedKey(UltimateStoragePlus.getInstance(), "storage_inventory");
-    private InventoryHolder inventoryHolder;
-    private Inventory inventory;
+    private final int inventorySize = 4 * 9;
+    private final InventoryHolder inventoryHolder;
+    private final Inventory inventory;
     private boolean dropMode;
     private boolean pullMode;
-    private final int inventorySize = 4 * 9;
-
     private ItemStack storedItem;
 
     private int storedQuantity;
 
-    private int maxQuantity;
+    private final int maxQuantity;
 
     /**
      * Constructor of the custom inventory
@@ -45,10 +43,10 @@ public class StorageInventory implements Listener, InventoryHolder {
         this.dropMode = true;
         this.pullMode = false;
         this.storedItem = inventoryHolder.getInventory().getItem(0);
-        this.storedQuantity = ((this.storedItem != null)
-                ? inventoryHolder.getInventory().getItem(0).getItemMeta()
-                .getPersistentDataContainer().get(INVENTORY_KEY, PersistentDataType.INTEGER)
-                : 0);
+        this.storedQuantity = 0;
+        if (this.storedItem != null) {
+            this.storedQuantity = this.storedItem.getItemMeta().getPersistentDataContainer().get(INVENTORY_KEY, PersistentDataType.INTEGER);
+        }
         this.maxQuantity = blockType.getItem().getItemMeta().getPersistentDataContainer()
                 .get(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER);
         this.inventory = Bukkit.createInventory(null, this.inventorySize,
@@ -74,7 +72,6 @@ public class StorageInventory implements Listener, InventoryHolder {
      * @return nothing
      */
     public void updateInventory() {
-
         if (this.dropMode) {
             int slot = 0;
             while (this.storedQuantity > 0 && slot < 27) {
@@ -126,25 +123,14 @@ public class StorageInventory implements Listener, InventoryHolder {
      */
     public int addItems(int quantity, ItemStack itemStack) {
         Inventory inv = this.inventoryHolder.getInventory();
-//        if (inv.getItem(0) == null || inv.getItem(0).getType() == Material.AIR) {
-//            ItemStack itemStackToAdd = itemStack.clone();
-//            itemStackToAdd.setAmount(1);
-//            inv.setItem(0, itemStack);
-//            storedItem = itemStack;
-//            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
-//            return 0;
-//        }
-        PersistentDataContainer container = inv.getItem(0).getItemMeta().getPersistentDataContainer();
-        ItemStack itemStackToAdd = itemStack.clone();
-        container.remove(INVENTORY_KEY);
-        if (storedItem == null || storedItem.getType() == Material.AIR) {
-            itemStack.setAmount(1);
-            inv.setItem(0, itemStack);
-            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
+        ItemStack itemStackClone = itemStack.clone();
+        if (storedItem == null) {
+            itemStackClone.setAmount(1);
+            itemStackClone.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, itemStack.getAmount());
+            inv.setItem(0, itemStackClone);
             return 0;
         }
-        
-        if (!storedItem.isSimilar(itemStackToAdd)) {
+        if (!storedItem.isSimilar(itemStack)) {
             return quantity;
         }
         storedQuantity += quantity;
@@ -163,8 +149,8 @@ public class StorageInventory implements Listener, InventoryHolder {
         storedQuantity -= quantity;
         storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, storedQuantity);
         if (storedQuantity < 0) {
-            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, ((-1) * storedQuantity));
-            return (-1) * storedQuantity;
+            storedItem.getItemMeta().getPersistentDataContainer().set(INVENTORY_KEY, PersistentDataType.INTEGER, 0);
+            return Math.abs(storedQuantity);
         }
         if (storedQuantity == 0) {
             storedItem = null;
@@ -211,6 +197,7 @@ public class StorageInventory implements Listener, InventoryHolder {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        System.out.println("Inventory click");
         if (!event.getClickedInventory().equals(this.inventory)) {
             return;
         }
@@ -228,8 +215,10 @@ public class StorageInventory implements Listener, InventoryHolder {
             return;
         }
 
-        ItemStack itemStackToAdd = this.storedItem.clone();
-        itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
+        ItemStack itemStackToAdd = (this.storedItem == null) ? currentItem.clone() : this.storedItem.clone();
+        if (itemStackToAdd.getItemMeta().getPersistentDataContainer().has(INVENTORY_KEY, PersistentDataType.INTEGER)) {
+            itemStackToAdd.getItemMeta().getPersistentDataContainer().remove(INVENTORY_KEY);
+        }
 
         Inventory playerInventory = event.getWhoClicked().getInventory();
         int quantityMoved = currentItem.getAmount();
@@ -239,6 +228,7 @@ public class StorageInventory implements Listener, InventoryHolder {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
+        System.out.println("Inventory drag");
         Inventory playerInventory = event.getWhoClicked().getInventory();
         if (!event.getInventory().equals(this.inventory)) {
             return;

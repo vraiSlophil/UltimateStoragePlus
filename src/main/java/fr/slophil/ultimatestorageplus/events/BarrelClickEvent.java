@@ -4,7 +4,6 @@ import fr.slophil.ultimatestorageplus.UltimateStoragePlus;
 import fr.slophil.ultimatestorageplus.entities.data.PlacedStorage;
 import fr.slophil.ultimatestorageplus.entities.repository.PlacedStorageRepository;
 import fr.slophil.ultimatestorageplus.entities.repository.Repositories;
-import fr.slophil.ultimatestorageplus.utils.StorageInventory;
 import org.bukkit.Material;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
@@ -13,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.sql.SQLException;
@@ -34,7 +32,7 @@ public class BarrelClickEvent implements Listener {
         Action action = event.getAction();
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        if (!action.equals(Action.RIGHT_CLICK_BLOCK)) {
+        if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.PHYSICAL)) {
             return;
         }
         if (!block.getType().equals(Material.BARREL)) {
@@ -43,20 +41,24 @@ public class BarrelClickEvent implements Listener {
         if (!(block.getState() instanceof Barrel || block.getState() instanceof InventoryHolder)) {
             return;
         }
-        InventoryHolder inventoryHolder = ((InventoryHolder) block.getState()).getInventory().getHolder();
-        if (inventoryHolder == null) {
-            return;
-        }
-        if (!(inventoryHolder instanceof Barrel)) {
-            return;
-        }
+//        InventoryHolder inventoryHolder = ((InventoryHolder) block.getState()).getInventory().getHolder();
+//        if (inventoryHolder == null) {
+//            return;
+//        }
+//        if (!(inventoryHolder instanceof Barrel)) {
+//            return;
+//        }
         PlacedStorageRepository repo = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
         Optional<PlacedStorage> query = repo.getByLocation(block.getLocation());
         if (query.isEmpty()) {
             return;
         }
         event.setCancelled(true);
-        StorageInventory storageInventory = new StorageInventory(inventoryHolder, query.get().getBlockType());
-        storageInventory.openInventory(player);
+//        StorageInventory storageInventory = new StorageInventory(inventoryHolder, query.get().getBlockType());
+//        storageInventory.openInventory(player);
+
+
+        player.isSneaking();
+
     }
 }

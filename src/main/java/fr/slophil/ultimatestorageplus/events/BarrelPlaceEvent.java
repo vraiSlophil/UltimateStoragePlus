@@ -60,7 +60,7 @@ public class BarrelPlaceEvent implements Listener {
 
             PlacedStorageRepository repository = (PlacedStorageRepository) Repositories.PLACED_STORAGE.getRepository();
 
-            PlacedStorage coords = new PlacedStorage(blockLocation, BlockType.STORAGE_1K);
+            PlacedStorage coords = new PlacedStorage(blockLocation, BlockType.getBlockType(itemContainer.get(UltimateStoragePlus.STORAGE_KEY, PersistentDataType.INTEGER)));
             try {
                 repository.save(coords);
             } catch (SQLException e) {

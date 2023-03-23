@@ -4,7 +4,7 @@ main: fr.slophil.ultimatestorageplus.UltimateStoragePlus
 api-version: 1.19
 prefix: UltimateStoragePlus
 authors: [ Slophil ]
-description: This plugin adds new storage blocks where you can put up to 1 million items.
+description: This plugin adds new storage blocks where you can put up to 256 millions items.
 
 commands:
   ultimatestorageplus:
