@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class StorageInventory implements Listener, InventoryHolder {
 
-    private final static NamespacedKey INVENTORY_KEY = new NamespacedKey(UltimateStoragePlus.getInstance(), "storage_inventory");
+    public final static NamespacedKey INVENTORY_KEY = new NamespacedKey(UltimateStoragePlus.getInstance(), "storage_inventory");
     private final int inventorySize = 4 * 9;
     private final InventoryHolder inventoryHolder;
     private final Inventory inventory;
